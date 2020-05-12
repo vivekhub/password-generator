@@ -8,3 +8,6 @@ A password generator creates unique and complex passwords.  Today while many pas
 3.  Support for exposing it as a QRCode so it can be transferred to my mobile phone from my screen.
 4.  Ensure that the generated password is reasonably secure by checking it againt Tory Hunt's [Have I been Pwned](https://haveibeenpwned.com/About) site
 
+I had written this for my personal use but decided to open source it in a
+fairly open MIT license so you can take and modify it for your own use as well.
+
