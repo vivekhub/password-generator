@@ -1,22 +1,30 @@
 #!/usr/bin/env python3
-# Copyright (c) Vivek Venugopalan, 2020.  
+# Copyright (c) Vivek Venugopalan, 2020.
 
+# Standard Library
 import os
 import random
 import string
-from argparse import ArgumentParser
-import urllib.request, urllib.error, urllib.parse
 import hashlib
+import urllib.error
+import urllib.parse
+import urllib.request
+from argparse import ArgumentParser
+
+# Project specific libraries
+import pyperclip
+
 
 def CopyClipboard(data):
-    os.popen('pbcopy -pboard general', 'wb').write(data)
+    pyperclip.copy(data)
 
 
 def CheckItem(dataset, pwd, flag):
     return len(set(dataset).intersection(set(pwd))) > 0 if flag else True
 
+
 def CheckAvailable(pwd, uppercase, digits, punctuation):
-    if not CheckItem(string.uppercase, pwd, uppercase):
+    if not CheckItem(string.ascii_uppercase, pwd, uppercase):
         return False
     if not CheckItem(string.digits, pwd, digits):
         return False
@@ -25,19 +33,19 @@ def CheckAvailable(pwd, uppercase, digits, punctuation):
 
     return True
 
+
 def printQRCode(pwd):
     import pyqrcode
     return pyqrcode.create(pwd).terminal(quiet_zone=1)
 
 
-def GenPassword(
-        length=10,
-        left_hand=False,
-        right_hand=False,
-        uppercase=False,
-        mixedcase=True,
-        digits=True,
-        punctuation=True):
+def GenPassword(length=10,
+                left_hand=False,
+                right_hand=False,
+                uppercase=False,
+                mixedcase=True,
+                digits=True,
+                punctuation=True):
     population = ''
     if left_hand:
         population = '12345qwertyasdfgzxcvb'
@@ -48,8 +56,8 @@ def GenPassword(
         if uppercase:
             population += 'UIOPJKLNMH'
     else:
-        population += string.uppercase if uppercase else ''
-        population += string.lowercase if mixedcase else ''
+        population += string.ascii_uppercase if uppercase else ''
+        population += string.ascii_lowercase if mixedcase else ''
         population += string.digits if digits else ''
         population += string.punctuation if punctuation else ''
 
@@ -62,15 +70,19 @@ def GenPassword(
 
 
 def check_compromised(pwd):
-    hashedpwd = hashlib.sha1(pwd).hexdigest().upper()
+    hashedpwd = hashlib.sha1(pwd.encode('utf-8')).hexdigest().upper()
     hashedprefix = hashedpwd[0:5]
     hashedremaining = hashedpwd[5:]
-    req = urllib.request.Request("https://api.pwnedpasswords.com/range/" + hashedprefix, None, 
-            {'User-agent' : 
-                'Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5'})
+    req = urllib.request.Request(
+        "https://api.pwnedpasswords.com/range/" + hashedprefix, None, {
+            'User-agent':
+            'Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5'
+        })
     stream = urllib.request.urlopen(req)
     for item in stream:
-        if hashedremaining == item.split(':')[0]:
+        # Convert byte stream to string https://stackoverflow.com/a/606199
+        str_item = item.decode('utf-8')
+        if hashedremaining == str_item.split(':')[0]:
             return True
     return False
 
@@ -94,82 +106,55 @@ if __name__ == '__main__':
 
     parser.add_argument('-n', '--number', dest='number', action='store_true')
     parser.add_argument(
-        '-N',
-        '--no-number',
-        dest='number',
-        action='store_false')
+        '-N', '--no-number', dest='number', action='store_false')
     parser.set_defaults(number=True)
 
     punc_group = parser.add_mutually_exclusive_group()
     punc_group.add_argument(
-        '-p',
-        '--punctuation',
-        dest='punctuation',
-        action='store_true')
+        '-p', '--punctuation', dest='punctuation', action='store_true')
     punc_group.add_argument(
-        '-P',
-        '--no-punctuation',
-        dest='punctuation',
-        action='store_false')
+        '-P', '--no-punctuation', dest='punctuation', action='store_false')
     punc_group.set_defaults(punctuation=False)
     parser.add_argument(
-        '-t',
-        '--length',
-        type=int,
-        action='store',
-        dest='length',
-        default=10)
+        '-t', '--length', type=int, action='store', dest='length', default=10)
 
     char_group = parser.add_mutually_exclusive_group()
     char_group.add_argument(
-        '-L',
-        '--no-lefthand',
-        dest='left_hand',
-        action='store_false')
+        '-L', '--no-lefthand', dest='left_hand', action='store_false')
     char_group.add_argument(
-        '-l',
-        '--lefthand',
-        dest='left_hand',
-        action='store_true')
+        '-l', '--lefthand', dest='left_hand', action='store_true')
     char_group.set_defaults(left_hand=False)
     char_group.add_argument(
-        '-R',
-        '--no-righthand',
-        dest='right_hand',
-        action='store_false')
+        '-R', '--no-righthand', dest='right_hand', action='store_false')
     char_group.add_argument(
-        '-r',
-        '--righthand',
-        dest='right_hand',
-        action='store_true')
+        '-r', '--righthand', dest='right_hand', action='store_true')
     parser.set_defaults(right_hand=False)
     print_group = parser.add_mutually_exclusive_group()
     print_group.add_argument(
-        '-q',
-        '--qrcode',
-        dest='qrcode',
-        action='store_true')
+        '-q', '--qrcode', dest='qrcode', action='store_true')
     parser.set_defaults(qrcode=False)
     args = parser.parse_args()
-    pwd = GenPassword(length=args.length,
-                      left_hand=args.left_hand,
-                      right_hand=args.right_hand,
-                      uppercase=args.uppercase,
-                      mixedcase=args.mixedcase,
-                      digits=args.number,
-                      punctuation=args.punctuation)
+    pwd = GenPassword(
+        length=args.length,
+        left_hand=args.left_hand,
+        right_hand=args.right_hand,
+        uppercase=args.uppercase,
+        mixedcase=args.mixedcase,
+        digits=args.number,
+        punctuation=args.punctuation)
     while check_compromised(pwd):
         print('compromised password :{0}. generating new one'.format(pwd))
-        pwd = GenPassword(length=args.length,
-                      left_hand=args.left_hand,
-                      right_hand=args.right_hand,
-                      uppercase=args.uppercase,
-                      mixedcase=args.mixedcase,
-                      digits=args.number,
-                      punctuation=args.punctuation)
+        pwd = GenPassword(
+            length=args.length,
+            left_hand=args.left_hand,
+            right_hand=args.right_hand,
+            uppercase=args.uppercase,
+            mixedcase=args.mixedcase,
+            digits=args.number,
+            punctuation=args.punctuation)
     CopyClipboard(pwd)
-   
+
     if args.qrcode:
         print(printQRCode(pwd))
     else:
-        print (pwd)
+        print(pwd)

@@ -11,3 +11,12 @@ A password generator creates unique and complex passwords.  Today while many pas
 I had written this for my personal use but decided to open source it in a
 fairly open MIT license so you can take and modify it for your own use as well.
 
+
+#Developer Notes
+
+1.  Requires Python 3.7 or greater
+2.  Uses two libaries, pyqrcode - for qrcode generation and pyperclip - for clipboard.
+3.  I use pipenv and so have included Pipfile
+4.  I have also added a requirements.txt for people who use a simple
+    requiremnets file.
+
