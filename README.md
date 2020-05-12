@@ -11,6 +11,9 @@ A password generator creates unique and complex passwords.  Today while many pas
 I had written this for my personal use but decided to open source it in a
 fairly open MIT license so you can take and modify it for your own use as well.
 
+# Similar Tools
+On linux there are a bunch of tools.  pwdgen, xkcdpass, diceware.  The funny
+and innovative one is the xkcdpass which came out of the [XKCD.936 comic](https://xkcd.com/936/).  
 
 # Developer Notes
 
