@@ -1,2 +1,3 @@
+-i https://pypi.org/simple/
 pyperclip==1.8.0
 pyqrcode==1.2.1
