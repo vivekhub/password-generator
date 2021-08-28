@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # Copyright (c) Vivek Venugopalan, 2020.
 
+import hashlib
 # Standard Library
-import os
 import random
 import string
-import hashlib
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -36,102 +35,110 @@ def check_available(pwd, uppercase, digits, punctuation):
 
 def print_qrcode(pwd):
     import pyqrcode
+
     return pyqrcode.create(pwd).terminal(quiet_zone=1)
 
 
-def gen_password(length=10,
-                left_hand=False,
-                right_hand=False,
-                uppercase=False,
-                mixedcase=True,
-                digits=True,
-                punctuation=True):
-    population = ''
+def gen_password(
+    length=10,
+    left_hand=False,
+    right_hand=False,
+    uppercase=False,
+    mixedcase=True,
+    digits=True,
+    punctuation=True,
+):
+    population = ""
     if left_hand:
-        population = '12345qwertyasdfgzxcvb'
+        population = "12345qwertyasdfgzxcvb"
         if uppercase:
-            population += 'QWERTYASDFGZXCVB'
+            population += "QWERTYASDFGZXCVB"
     elif right_hand:
-        population = '[];\',/.7890-uiopjklnmHh'
+        population = "[];',/.7890-uiopjklnmHh"
         if uppercase:
-            population += 'UIOPJKLNMH'
+            population += "UIOPJKLNMH"
     else:
-        population += string.ascii_uppercase if uppercase else ''
-        population += string.ascii_lowercase if mixedcase else ''
-        population += string.digits if digits else ''
-        population += string.punctuation if punctuation else ''
+        population += string.ascii_uppercase if uppercase else ""
+        population += string.ascii_lowercase if mixedcase else ""
+        population += string.digits if digits else ""
+        population += string.punctuation if punctuation else ""
 
     rnd = random.SystemRandom()
-    pwd = ''.join(rnd.sample(population, length))
+    pwd = "".join(rnd.sample(population, length))
     while not check_available(pwd, uppercase, digits, punctuation):
-        pwd = ''.join(rnd.sample(population, length))
+        pwd = "".join(rnd.sample(population, length))
 
     return pwd
 
 
 def check_compromised(pwd):
-    hashedpwd = hashlib.sha1(pwd.encode('utf-8')).hexdigest().upper()
+    hashedpwd = hashlib.sha1(pwd.encode("utf-8")).hexdigest().upper()
     hashedprefix = hashedpwd[0:5]
     hashedremaining = hashedpwd[5:]
     req = urllib.request.Request(
-        "https://api.pwnedpasswords.com/range/" + hashedprefix, None, {
-            'User-agent':
-            'Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5'
-        })
+        "https://api.pwnedpasswords.com/range/" + hashedprefix,
+        None,
+        {
+            "User-agent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5"
+        },
+    )
     stream = urllib.request.urlopen(req)
     for item in stream:
         # Convert byte stream to string https://stackoverflow.com/a/606199
-        str_item = item.decode('utf-8')
-        if hashedremaining == str_item.split(':')[0]:
+        str_item = item.decode("utf-8")
+        if hashedremaining == str_item.split(":")[0]:
             return True
     return False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = ArgumentParser()
     uc_group = parser.add_mutually_exclusive_group()
     uc_group.add_argument(
-        '-u',
-        '--uppercase',
-        dest='uppercase',
-        action='store_true',
-        help='Use ONLY uppercase letters')
+        "-u",
+        "--uppercase",
+        dest="uppercase",
+        action="store_true",
+        help="Use ONLY uppercase letters",
+    )
     uc_group.add_argument(
-        '-o',
-        '--mixedcase',
-        dest='mixedcase',
-        action='store_true',
-        help='Use mixed case letters (default)')
+        "-o",
+        "--mixedcase",
+        dest="mixedcase",
+        action="store_true",
+        help="Use mixed case letters (default)",
+    )
     uc_group.set_defaults(mixedcase=True)
 
-    parser.add_argument('-n', '--number', dest='number', action='store_true')
-    parser.add_argument(
-        '-N', '--no-number', dest='number', action='store_false')
+    parser.add_argument("-n", "--number", dest="number", action="store_true")
+    parser.add_argument("-N", "--no-number", dest="number", action="store_false")
     parser.set_defaults(number=True)
 
     punc_group = parser.add_mutually_exclusive_group()
     punc_group.add_argument(
-        '-p', '--punctuation', dest='punctuation', action='store_true')
+        "-p", "--punctuation", dest="punctuation", action="store_true"
+    )
     punc_group.add_argument(
-        '-P', '--no-punctuation', dest='punctuation', action='store_false')
+        "-P", "--no-punctuation", dest="punctuation", action="store_false"
+    )
     punc_group.set_defaults(punctuation=False)
     parser.add_argument(
-        '-t', '--length', type=int, action='store', dest='length', default=10)
+        "-t", "--length", type=int, action="store", dest="length", default=10
+    )
 
     char_group = parser.add_mutually_exclusive_group()
     char_group.add_argument(
-        '-L', '--no-lefthand', dest='left_hand', action='store_false')
-    char_group.add_argument(
-        '-l', '--lefthand', dest='left_hand', action='store_true')
+        "-L", "--no-lefthand", dest="left_hand", action="store_false"
+    )
+    char_group.add_argument("-l", "--lefthand", dest="left_hand", action="store_true")
     char_group.set_defaults(left_hand=False)
     char_group.add_argument(
-        '-R', '--no-righthand', dest='right_hand', action='store_false')
-    char_group.add_argument(
-        '-r', '--righthand', dest='right_hand', action='store_true')
+        "-R", "--no-righthand", dest="right_hand", action="store_false"
+    )
+    char_group.add_argument("-r", "--righthand", dest="right_hand", action="store_true")
     parser.set_defaults(right_hand=False)
     print_group = parser.add_mutually_exclusive_group()
-    print_group.add_argument(
-        '-q', '--qrcode', dest='qrcode', action='store_true')
+    print_group.add_argument("-q", "--qrcode", dest="qrcode", action="store_true")
     parser.set_defaults(qrcode=False)
     args = parser.parse_args()
     pwd = gen_password(
@@ -141,9 +148,12 @@ if __name__ == '__main__':
         uppercase=args.uppercase,
         mixedcase=args.mixedcase,
         digits=args.number,
-        punctuation=args.punctuation)
+        punctuation=args.punctuation,
+    )
+    count = 1
     while check_compromised(pwd):
-        print('compromised password :{0}. generating new one'.format(pwd))
+        print("compromised password generated.  Generating {0} password".format(count))
+        count += 1
         pwd = gen_password(
             length=args.length,
             left_hand=args.left_hand,
@@ -151,7 +161,8 @@ if __name__ == '__main__':
             uppercase=args.uppercase,
             mixedcase=args.mixedcase,
             digits=args.number,
-            punctuation=args.punctuation)
+            punctuation=args.punctuation,
+        )
     copy_clipboard(pwd)
 
     if args.qrcode:
