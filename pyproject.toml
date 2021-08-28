@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "password-generator"
+version = "0.1.0"
+description = "Generate unique complex passwords"
+authors = ["Vivek Venugopalan <github@vivekv.info>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pyperclip = "^1.8.2"
+PyQRCode = "^1.2.1"
+
+[tool.poetry.dev-dependencies]
+isort = "^5.9.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

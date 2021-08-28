@@ -15,31 +15,31 @@ from argparse import ArgumentParser
 import pyperclip
 
 
-def CopyClipboard(data):
+def copy_clipboard(data):
     pyperclip.copy(data)
 
 
-def CheckItem(dataset, pwd, flag):
+def check_item(dataset, pwd, flag):
     return len(set(dataset).intersection(set(pwd))) > 0 if flag else True
 
 
-def CheckAvailable(pwd, uppercase, digits, punctuation):
-    if not CheckItem(string.ascii_uppercase, pwd, uppercase):
+def check_available(pwd, uppercase, digits, punctuation):
+    if not check_item(string.ascii_uppercase, pwd, uppercase):
         return False
-    if not CheckItem(string.digits, pwd, digits):
+    if not check_item(string.digits, pwd, digits):
         return False
-    if not CheckItem(string.punctuation, pwd, punctuation):
+    if not check_item(string.punctuation, pwd, punctuation):
         return False
 
     return True
 
 
-def printQRCode(pwd):
+def print_qrcode(pwd):
     import pyqrcode
     return pyqrcode.create(pwd).terminal(quiet_zone=1)
 
 
-def GenPassword(length=10,
+def gen_password(length=10,
                 left_hand=False,
                 right_hand=False,
                 uppercase=False,
@@ -63,7 +63,7 @@ def GenPassword(length=10,
 
     rnd = random.SystemRandom()
     pwd = ''.join(rnd.sample(population, length))
-    while not CheckAvailable(pwd, uppercase, digits, punctuation):
+    while not check_available(pwd, uppercase, digits, punctuation):
         pwd = ''.join(rnd.sample(population, length))
 
     return pwd
@@ -134,7 +134,7 @@ if __name__ == '__main__':
         '-q', '--qrcode', dest='qrcode', action='store_true')
     parser.set_defaults(qrcode=False)
     args = parser.parse_args()
-    pwd = GenPassword(
+    pwd = gen_password(
         length=args.length,
         left_hand=args.left_hand,
         right_hand=args.right_hand,
@@ -144,7 +144,7 @@ if __name__ == '__main__':
         punctuation=args.punctuation)
     while check_compromised(pwd):
         print('compromised password :{0}. generating new one'.format(pwd))
-        pwd = GenPassword(
+        pwd = gen_password(
             length=args.length,
             left_hand=args.left_hand,
             right_hand=args.right_hand,
@@ -152,9 +152,9 @@ if __name__ == '__main__':
             mixedcase=args.mixedcase,
             digits=args.number,
             punctuation=args.punctuation)
-    CopyClipboard(pwd)
+    copy_clipboard(pwd)
 
     if args.qrcode:
-        print(printQRCode(pwd))
+        print(print_qrcode(pwd))
     else:
         print(pwd)
