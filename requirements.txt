@@ -1,3 +1,5 @@
--i https://pypi.org/simple/
-pyperclip==1.8.2
-pyqrcode==1.2.1
+pyperclip==1.8.2 \
+    --hash=sha256:105254a8b04934f0bc84e9c24eb360a591aaf6535c9def5f29d92af107a9bf57
+pyqrcode==1.2.1 \
+    --hash=sha256:fdbf7634733e56b72e27f9bce46e4550b75a3a2c420414035cae9d9d26b234d5 \
+    --hash=sha256:1b2812775fa6ff5c527977c4cd2ccb07051ca7d0bc0aecf937a43864abe5eff6
