@@ -19,7 +19,9 @@ and innovative one is the xkcdpass which came out of the [XKCD.936 comic](https:
 
 1.  Requires Python 3.7 or greater
 2.  Uses two libaries, pyqrcode - for qrcode generation and pyperclip - for clipboard.
-3.  I use pipenv and so have included Pipfile
+3.  I use [Poetry](https://python-poetry.org/) for dependency management.  You
+    should too!
 4.  I have also added a requirements.txt for people who use a simple
-    requiremnets file.
+    requirements file.  You can generate it from Poetry with
+    ```poetry export -f requirements.txt > requirements.txt```
 
