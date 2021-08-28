@@ -2,6 +2,7 @@
 # Copyright (c) Vivek Venugopalan, 2020.
 
 import hashlib
+
 # Standard Library
 import random
 import string
@@ -48,18 +49,18 @@ def gen_password(
     digits=True,
     punctuation=True,
 ):
-    population = ""
+    population = None
     if left_hand:
-        population = "12345qwertyasdfgzxcvb"
+        population = "12345qwertyasdfgzxcv"
         if uppercase:
-            population += "QWERTYASDFGZXCVB"
+            population += "QWERTYASDFGZXCV"
     elif right_hand:
-        population = "[];',/.7890-uiopjklnmHh"
+        population = "[];',/.7890-uiopjklnmHhb"
         if uppercase:
-            population += "UIOPJKLNMH"
+            population += "UIOPJKLNMHB"
     else:
-        population += string.ascii_uppercase if uppercase else ""
-        population += string.ascii_lowercase if mixedcase else ""
+        population = string.ascii_uppercase if uppercase else string.ascii_lowercase
+        population += string.ascii_uppercase if mixedcase else ""
         population += string.digits if digits else ""
         population += string.punctuation if punctuation else ""
 
