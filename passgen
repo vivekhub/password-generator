@@ -11,12 +11,13 @@ import urllib.parse
 import urllib.request
 from argparse import ArgumentParser
 
-# Project specific libraries
-import pyperclip
-
 
 def copy_clipboard(data):
-    pyperclip.copy(data)
+    try:
+        import pyperclip
+        pyperclip.copy(data)
+    except ModuleNotFoundError:
+        pass
 
 
 def check_item(dataset, pwd, flag):
@@ -35,10 +36,13 @@ def check_available(pwd, uppercase, digits, punctuation):
 
 
 def print_qrcode(pwd):
-    import pyqrcode
+    try:
+        import pyqrcode
 
-    return pyqrcode.create(pwd).terminal(quiet_zone=1)
-
+        return pyqrcode.create(pwd).terminal(quiet_zone=1)
+    except ModuleNotFoundError as e:
+        print(e)
+        return None
 
 def gen_password(
     length=10,
@@ -167,6 +171,7 @@ if __name__ == "__main__":
     copy_clipboard(pwd)
 
     if args.qrcode:
-        print(print_qrcode(pwd))
+        code = print_qrcode(pwd)
+        print(code if code else pwd)
     else:
         print(pwd)
