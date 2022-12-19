@@ -11,7 +11,7 @@ pyperclip = "^1.8.2"
 PyQRCode = "^1.2.1"
 
 [tool.poetry.dev-dependencies]
-isort = "^5.10.1"
+isort = "^5.11.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
